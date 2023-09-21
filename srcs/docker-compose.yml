@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - vuejs-front
+
+  vuejs-front:
+    build:
+      context: ./requirements/vuejs
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
+  postgres:
+    build:
+      context: ./requirements/postgredb
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  api:
+    build:
+      context: ./requirements/api_node
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+volumes:
+  pg_data:
